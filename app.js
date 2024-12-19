@@ -145,6 +145,6 @@ app.post('/api/remove-crate', (req, res) => {
 
 
 // Start server
-app.listen(PORT, "192.168.68.55", () => {
+app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
