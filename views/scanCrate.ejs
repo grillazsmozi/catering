@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Crate</title>
+    <script src="/removeScript.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan to Remove Crate</h1>
+    <p>1. Scan the crate ID. <br>2. Scan each item in the crate. <br>3. Scan the crate ID again to remove it.</p>
+    <input type="text" id="scanInput" autofocus>
+
+    <div id="message"></div>
+
+    <h2>Existing Crates</h2>
+    <ul id="crateList">
+        <% for (let crate in crates) { %>
+            <li><strong><%= crate %></strong>: <%= crates[crate].items.join(', ') %></li>
+        <% } %>
+    </ul>
+</body>
+</html>

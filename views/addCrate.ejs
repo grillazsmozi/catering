@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Crate</title>
+    <script src="/script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        #camera {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+        }
+        #camera canvas {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan to Add Crate</h1>
+    <p>Scan a crate code, then scan items one by one. Scan "FINALIZE" to complete crate creation.</p>
+    <input type="text" id="scanInput" autofocus>
+
+    <div id="reader"></div>
+
+    <div id="message"></div>
+
+    <h2>Existing Crates</h2>
+    <ul id="crateList">
+        <% for (let crate in crates) { %>
+            <li><strong><%= crate %></strong>: <%= crates[crate].items.join(', ') %></li>
+        <% } %>
+    </ul>
+
+    <script>
+
+            const event = new KeyboardEvent('keydown', {
+                key: 'Enter',
+                code: 'Enter',
+                which: 13,
+                keyCode: 13,
+                });
+
+        const scanner = new Html5QrcodeScanner('reader', { 
+            // Scanner will be initialized in DOM inside element with id of 'reader'
+            qrbox: {
+                width: 250,
+                height: 250,
+            },  // Sets dimensions of scanning box (set relative to reader element width)
+            fps: 20, // Frames per second to attempt a scan
+        });
+    
+    
+        scanner.render(success, error);
+        // Starts scanner
+    
+        function success(result) {
+    
+            document.getElementById("scanInput").value = result
+            document.getElementById("scanInput").dispatchEvent(event)
+            // Prints result as a link inside result element
+    
+            scanner.clear();
+            // Clears scanning instance
+    
+            document.getElementById('reader').remove();
+            // Removes reader element from DOM since no longer needed
+        
+        }
+    
+        function error(err) {
+            console.error(err);
+            // Prints any errors to the console
+        }
+    
+    </script>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const message = document.getElementById('message');
+
+        // Start camera
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(err => {
+                console.error("Error accessing camera: ", err);
+                message.textContent = "Error accessing camera.";
+                message.className = "error";
+            });
+
+        function scanQRCode() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                if (code) {
+                    message.textContent = `Scanned: ${code.data}`;
+                    message.className = "success";
+                    // Add custom logic here for scanned data
+                }
+            }
+
+            requestAnimationFrame(scanQRCode);
+        }
+
+        // Start scanning
+        scanQRCode();
+    </script>
+</body>
+</html>
