@@ -37,7 +37,7 @@ app.post('/api/add-crate', (req, res) => {
     }
 
     // Finalize crate creation
-    if (scanCode.toUpperCase() === "F") {
+    if (scanCode.toUpperCase() === "0") {
         if (currentCrate.items.length === 0) {
             currentCrate = null;
             return res.json({ message: "No items scanned. Crate creation canceled.", success: false });
@@ -145,6 +145,6 @@ app.post('/api/remove-crate', (req, res) => {
 
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, "192.168.68.52", () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
